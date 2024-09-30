@@ -203,27 +203,37 @@ static void scan_init(void)
 }
 static void scan_evt_handler(scan_evt_t const * p_scan_evt)
 {
-   switch(p_scan_evt->scan_evt_id)
-   {
-     case NRF_BLE_SCAN_EVT_FILTER_MATCH:
-     case NRF_BLE_SCAN_EVT_FILTER_NO_MATCH:
-     {
-        // Get the advertising report
-        const ble_gap_evt_adv_report_t * p_adv_report = p_scan_evt->params.filter_match.p_adv_report;
-        // Extract the MAC address
-        char addr_str[BLE_GAP_ADDR_LEN * 2 + 1];
-        for (int i = 0; i < BLE_GAP_ADDR_LEN; i++)
+    switch(p_scan_evt->scan_evt_id)
+    {
+        case NRF_BLE_SCAN_EVT_FILTER_MATCH:
+        case NRF_BLE_SCAN_EVT_FILTER_NO_MATCH:
         {
-          sprintf(&addr_str[i * 2], "%02X", p_adv_report->peer_addr.addr[BLE_GAP_ADDR_LEN - i - 1]);
-        }
-        // Send the MAC address over USB CDC ACM
-        app_usbd_cdc_acm_write(&m_app_cdc_acm, addr_str, strlen(addr_str));
-        app_usbd_cdc_acm_write(&m_app_cdc_acm, "\r\n", 2);
-     } break;
-    default:
-      break;
+            // Get the advertising report
+            const ble_gap_evt_adv_report_t * p_adv_report = p_scan_evt->params.filter_match.p_adv_report;
+
+            // Extract the MAC address
+            char addr_str[BLE_GAP_ADDR_LEN * 2 + 1];
+            for (int i = 0; i < BLE_GAP_ADDR_LEN; i++)
+            {
+                sprintf(&addr_str[i * 2], "%02X", p_adv_report->peer_addr.addr[BLE_GAP_ADDR_LEN - i - 1]);
+            }
+
+            // Extract the RSSI value
+            int8_t rssi = p_adv_report->rssi;
+
+            // Format the data string to include MAC address and RSSI
+            char data_str[50];
+            sprintf(data_str, "%s,%d\n", addr_str, rssi);
+
+            // Send the data over USB CDC ACM
+            app_usbd_cdc_acm_write(&m_app_cdc_acm, data_str, strlen(data_str));
+        } break;
+
+        default:
+            break;
     }
- }
+}
+
 
 static void cdc_acm_user_ev_handler(app_usbd_class_inst_t const * p_inst, app_usbd_cdc_acm_user_event_t event)
 {
