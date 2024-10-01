@@ -85,7 +85,6 @@
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
-/* ChatGPT */
 #include "app_usbd.h"
 #include "app_usbd_cdc_acm.h"
 #include "app_timer.h"
@@ -96,7 +95,6 @@
 #define UART_RX_BUF_SIZE        256                                     /**< UART RX buffer size. */
 #define NUS_SERVICE_UUID_TYPE   BLE_UUID_TYPE_VENDOR_BEGIN              /**< UUID type for the Nordic UART Service (vendor specific). */
 #define ECHOBACK_BLE_UART_DATA  1                                       /**< Echo the UART data that is received over the Nordic UART Service (NUS) back to the sender. */
-
 NRF_BLE_SCAN_DEF(m_scan); // Scanning module instance
 BLE_DB_DISCOVERY_DEF(m_db_disc); // Database discovery module instance
 APP_USBD_CDC_ACM_GLOBAL_DEF(m_app_cdc_acm, // USB CDC ACM instance
@@ -105,23 +103,18 @@ APP_USBD_CDC_ACM_GLOBAL_DEF(m_app_cdc_acm, // USB CDC ACM instance
  NRF_DRV_USBD_EPOUT2,
  NRF_DRV_USBD_EPIN3,
  APP_USBD_CDC_COMM_PROTOCOL_AT_V250);
-
 BLE_NUS_C_DEF(m_ble_nus_c);                                             /**< BLE Nordic UART Service (NUS) client instance. */
 NRF_BLE_GATT_DEF(m_gatt);                                               /**< GATT module instance. */                                      /**< Database discovery module instance. */                                             /**< Scanning Module instance. */
 NRF_BLE_GQ_DEF(m_ble_gatt_queue,                                        /**< BLE GATT Queue instance. */
                NRF_SDH_BLE_CENTRAL_LINK_COUNT,
                NRF_BLE_GQ_QUEUE_SIZE);
-
 static uint16_t m_ble_nus_max_data_len = BLE_GATT_ATT_MTU_DEFAULT - OPCODE_LENGTH - HANDLE_LENGTH; /**< Maximum length of data (in bytes) that can be transmitted to the peer by the Nordic UART service module. */
-
 /**@brief NUS UUID. */
 static ble_uuid_t const m_nus_uuid =
 {
     .uuid = BLE_UUID_NUS_SERVICE,
     .type = NUS_SERVICE_UUID_TYPE
 };
-
-
 /**@brief Function for handling asserts in the SoftDevice.
  *
  * @details This function is called in case of an assert in the SoftDevice.
@@ -137,8 +130,6 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
 {
     app_error_handler(0xDEADBEEF, line_num, p_file_name);
 }
-
-
 static void ble_stack_init(void)
 {
    ret_code_t err_code;
@@ -153,9 +144,6 @@ static void ble_stack_init(void)
    err_code = nrf_sdh_ble_enable(&ram_start);
    APP_ERROR_CHECK(err_code);
 }
-
-
-
 /**@brief Function for handling the Nordic UART Service Client errors.
  *
  * @param[in]   nrf_error   Error code containing information about what went wrong.
@@ -179,7 +167,6 @@ static void ble_stack_init(void)
    err_code = nrf_sdh_ble_enable(&ram_start);
    APP_ERROR_CHECK(err_code);
 }
-
 /**@brief Function to start scanning. */
 static void scan_start(void)
 {
@@ -233,8 +220,6 @@ static void scan_evt_handler(scan_evt_t const * p_scan_evt)
             break;
     }
 }
-
-
 static void cdc_acm_user_ev_handler(app_usbd_class_inst_t const * p_inst, app_usbd_cdc_acm_user_event_t event)
 {
    switch (event)
@@ -267,8 +252,6 @@ static void usbd_init(void)
    err_code = app_usbd_class_append(class_cdc_acm);
    APP_ERROR_CHECK(err_code);
 }
-
-
 int main(void)
 {
    ret_code_t err_code;
